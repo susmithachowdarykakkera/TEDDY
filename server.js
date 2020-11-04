@@ -4,7 +4,6 @@ if (process.env.NODE_ENV !== "production") {
 
 const express = require("express");
 const app = express();
-const bcrypt = require("bcrypt");
 const passport = require("passport");
 const flash = require("express-flash");
 const session = require("express-session");
@@ -84,12 +83,12 @@ app.get("/signup", checkNotAuthenticated, (req, res) => {
 
 app.post("/signup", checkNotAuthenticated, async (req, res) => {
     try {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
+        // const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
         const user = new User({
             name: req.body.name,
             email: req.body.email,
-            password: hashedPassword,
+            password: req.body.password,
         });
         user.save(function (err, savedUser) {
             if (err) {
