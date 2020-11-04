@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(flash());
 app.use(
     session({
-        secret: process.env.SESSION_SECRET,
+        secret: "secret",
         resave: false,
         saveUninitialized: false,
     })
@@ -124,16 +124,22 @@ function checkNotAuthenticated(req, res, next) {
     next();
 }
 
-mongoose.connect(process.env.mongoURI, {
+mongoose.connect("mongodb+srv://sush:sush@cluster0.fyiyl.mongodb.net/test", {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 });
 const db = mongoose.connection;
 db.on("error", (error) =>
-    console.error("Error at connecting the MongodB :" + err)
+    console.error("Error at connecting the MongodB :" + error)
 );
 db.once("open", () =>
     console.log("MongoDB connection established sucessfully")
 );
 
-app.listen(8000);
+app.listen(8000, (error) => {
+    if (error) {
+        console.log(error);
+    } else {
+        console.log(`Server is listening on port 8000`);
+    }
+});
