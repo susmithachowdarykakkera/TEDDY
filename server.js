@@ -10,19 +10,15 @@ const flash = require("express-flash");
 const session = require("express-session");
 const methodoverride = require("method-override");
 const mongoose = require("mongoose");
+const morgan = require("morgan");
 
 const User = require("./models/User");
 
 const initializePassport = require("./passport-config");
-initializePassport(
-    passport,
-    (email) => users.find((user) => user.email === email),
-    (id) => users.find((user) => user.id === id)
-);
-
-const users = [];
+initializePassport(passport);
 
 app.set("views-engine", "ejs");
+app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: false }));
 app.use(flash());
 app.use(
@@ -37,10 +33,39 @@ app.use(passport.session());
 app.use(methodoverride("_method"));
 
 app.get("/", checkAuthenticated, (req, res) => {
-    res.render("index.ejs", { name: req.user.name });
+    res.render("index.ejs", {
+        name: req.user.name,
+        bio: req.user.bio,
+        image: req.user.image,
+    });
 });
 app.get("/login", checkNotAuthenticated, (req, res) => {
     res.render("login.ejs");
+});
+
+app.get("/editprofile", checkAuthenticated, (req, res) => {
+    res.render("edit.ejs", {
+        name: req.user.name,
+        bio: req.user.bio,
+        image: req.user.image,
+    });
+});
+
+app.post("/editprofile", checkAuthenticated, (req, res) => {
+    const name = req.body.name;
+    const bio = req.body.bio;
+    const id = req.user._id;
+
+    // AES-S3 bucket url
+    // const image = data.Location
+    const image = req.user.image;
+
+    User.findByIdAndUpdate(id, { name, bio, image }, { new: true })
+        .then((newUserData) => {
+            req.user = newUserData;
+            res.redirect("/");
+        })
+        .catch((error) => res.status(401).json(error));
 });
 
 app.post(
@@ -61,31 +86,24 @@ app.post("/signup", checkNotAuthenticated, async (req, res) => {
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-        const user = new UserModel({
+        const user = new User({
             name: req.body.name,
             email: req.body.email,
             password: hashedPassword,
         });
         user.save(function (err, savedUser) {
             if (err) {
-                return next(err);
+                console.log(err);
+                res.redirect("/signup");
             }
             console.log("----------Signup Success--------");
             console.log(savedUser);
             res.redirect("/login");
         });
-
-        // users.push({
-        //     id: Date.now().toString(),
-        //     name: req.body.name,
-        //     email: req.body.email,
-        //     password: hashedPassword,
-        // });
-        // res.redirect("/login");
-    } catch {
+    } catch (err) {
+        console.log(err);
         res.redirect("/signup");
     }
-    console.log(users);
 });
 
 app.delete("/logout", (req, res) => {

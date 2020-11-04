@@ -14,37 +14,49 @@
     </head>
     <body>
         <div class="container">
-            <h1>LOGIN</h1>
+            <h1>edit</h1>
             <% if (messages.error) { %> <%= messages.error %> <% } %>
-            <form action="/login" method="POST">
+            <form action="/editprofile" method="POST">
                 <div class="form-group">
-                    <label for="email">email</label>
+                    <label for="name">name</label>
                     <input
-                        type="email"
+                        type="text"
                         class="form-control"
-                        id="email"
-                        name="email"
+                        id="name"
+                        name="name"
+                        value="<%= name %>"
                         required
-                        aria-describedby="emailHelp"
                     />
-                    <small id="emailHelp" class="form-text text-muted"
-                        >We'll never share your email with anyone else.</small
-                    >
                 </div>
 
                 <div class="form-group">
-                    <label for="password">Password</label>
-                    <input
-                        type="password"
+                    <label for="bio">EBiography</label>
+                    <textarea
                         class="form-control"
-                        id="password"
-                        name="password"
-                        required
-                    />
+                        id="bio"
+                        name="bio"
+                        rows="5"
+                        value="<%= bio %>"
+                    ></textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Login</button>
+
+                <div class="input-group">
+                    <div class="custom-file">
+                        <input
+                            type="file"
+                            class="custom-file-input"
+                            id="inputGroupFile04"
+                            aria-describedby="inputGroupFileAddon04"
+                        />
+                        <label class="custom-file-label" for="inputGroupFile04"
+                            >Choose file</label
+                        >
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    Edit Profile
+                </button>
             </form>
-            <a href="/signup">SIGN UP</a>
         </div>
     </body>
 
