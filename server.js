@@ -4,6 +4,7 @@ if (process.env.NODE_ENV !== "production") {
 
 const express = require("express");
 const app = express();
+const multer = require("multer");
 const passport = require("passport");
 const flash = require("express-flash");
 const session = require("express-session");
@@ -17,6 +18,7 @@ const initializePassport = require("./passport-config");
 initializePassport(passport);
 
 app.set("views-engine", "ejs");
+
 app.use(morgan("dev"));
 app.use(express.urlencoded({ extended: false }));
 app.use(flash());
@@ -57,6 +59,7 @@ app.post("/editprofile", checkAuthenticated, (req, res) => {
 
     // AES-S3 bucket url
     // const image = data.Location
+
     const image = req.user.image;
 
     User.findByIdAndUpdate(id, { name, bio, image }, { new: true })
